@@ -1,0 +1,63 @@
+plugins {
+    id 'java'
+    id "org.springframework.boot" version "2.2.0.RELEASE"
+    id "io.spring.dependency-management" version "1.0.8.RELEASE"
+    id "org.liquibase.gradle" version "2.0.1"
+}
+
+group 'backend'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+    // Spring Boot
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+
+    // DB
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'org.postgresql:postgresql:42.2.8'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.10'
+    annotationProcessor 'org.projectlombok:lombok:1.18.10'
+
+    // Liquibase Dependencies:
+    runtimeOnly 'org.liquibase:liquibase-core:3.8.0'
+    runtimeOnly 'org.liquibase:liquibase-groovy-dsl:2.1.0'
+
+    // Liquibase Gradle Plugin Dependencies:
+    // The following are dependencies that liquibase requires are in the classpath
+    liquibaseRuntime 'org.liquibase:liquibase-core:3.8.0'
+    liquibaseRuntime 'org.liquibase:liquibase-groovy-dsl:2.1.0'
+    liquibaseRuntime 'org.liquibase.ext:liquibase-hibernate5:3.8'
+    liquibaseRuntime 'org.postgresql:postgresql'
+    liquibaseRuntime 'org.springframework.boot:spring-boot-starter-data-jpa'
+    // Undocumented magic sauce, diff requires compiled sources
+    liquibaseRuntime sourceSets.main.output
+}
+
+// Undocumented magic sauce
+diff.dependsOn compileJava
+diffChangeLog.dependsOn compileJava
+
+liquibase {
+    activities {
+        main {
+            changeLogFile "$projectDir/src/main/resources/migrations/XXX-RENAME-ME.groovy"
+            url 'jdbc:postgresql://localhost:5432/testDb'
+            username 'emil'
+            password '1234'
+            driver 'org.postgresql.Driver'
+            referenceUrl 'hibernate:spring:dk.backend.repository?dialect=org.hibernate.dialect.PostgreSQL9Dialect&hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy&hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy'
+        }
+    }
+}

@@ -1,0 +1,28 @@
+version: "3.4"
+
+services:
+  pgAdmin:
+    restart: always
+    image: dpage/pgadmin4
+    ports:
+      - "8080:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: emil@admin.com
+      PGADMIN_DEFAULT_PASSWORD: 1234
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+  postgres:
+    restart: always
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: emil
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: testDb
+    volumes:
+      - pgvol:/var/lib/postgresql/data
+
+volumes:
+  pgvol:
+  pgadmin:
